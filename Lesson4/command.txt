@@ -1,6 +1,6 @@
 USE `lesson3`;
 
-# 1.Создать VIEW на основе запросов, которые вы сделали в ДЗ к уроку 3.
+# 1.РЎРѕР·РґР°С‚СЊ VIEW РЅР° РѕСЃРЅРѕРІРµ Р·Р°РїСЂРѕСЃРѕРІ, РєРѕС‚РѕСЂС‹Рµ РІС‹ СЃРґРµР»Р°Р»Рё РІ Р”Р— Рє СѓСЂРѕРєСѓ 3.
 CREATE VIEW `average_sal` AS 
 SELECT `depart`.`name`, AVG(`salary`) AS `average` FROM `shtat` 
 INNER JOIN `depart` 
@@ -8,17 +8,17 @@ ON `depart`.`id` = `shtat`.`depart`
 GROUP BY `depart`.`name`;
 
 
-# 2. Создать функцию, которая найдет менеджера по имени и фамилии.
+# 2. РЎРѕР·РґР°С‚СЊ С„СѓРЅРєС†РёСЋ, РєРѕС‚РѕСЂР°СЏ РЅР°Р№РґРµС‚ РјРµРЅРµРґР¶РµСЂР° РїРѕ РёРјРµРЅРё Рё С„Р°РјРёР»РёРё.
 CREATE FUNCTION `find_manager`(name_manager CHAR(25), lastname_manager CHAR(25))
 RETURNS CHAR(50) DETERMINISTIC
 RETURN (SELECT `id` FROM `shtat`
 WHERE (`name` = name_manager AND `lastname` = lastname_manager));
 
-SELECT `find_manager`('Георгий','Мухин');
+SELECT `find_manager`('Р“РµРѕСЂРіРёР№','РњСѓС…РёРЅ');
 
 
-# 3. Создать триггер, который при добавлении нового сотрудника будет выплачивать 
-ему вступительный бонус, занося запись об этом в таблицу salary.
+# 3. РЎРѕР·РґР°С‚СЊ С‚СЂРёРіРіРµСЂ, РєРѕС‚РѕСЂС‹Р№ РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РЅРѕРІРѕРіРѕ СЃРѕС‚СЂСѓРґРЅРёРєР° Р±СѓРґРµС‚ РІС‹РїР»Р°С‡РёРІР°С‚СЊ 
+РµРјСѓ РІСЃС‚СѓРїРёС‚РµР»СЊРЅС‹Р№ Р±РѕРЅСѓСЃ, Р·Р°РЅРѕСЃСЏ Р·Р°РїРёСЃСЊ РѕР± СЌС‚РѕРј РІ С‚Р°Р±Р»РёС†Сѓ salary.
 
 CREATE TABLE IF NOT EXISTS `salary` (
 `id` INT NOT NULL AUTO_INCREMENT,
@@ -39,6 +39,5 @@ INSERT INTO `salary` (`employee`, `salary`, `start_bonus`) VALUE
 
 INSERT INTO `shtat`
 (`name`,`lastname`,`depart`,`salary`) VALUE
-('Владимир','Рустамов',5,40000);
-
+('Р’Р»Р°РґРёРјРёСЂ','Р СѓСЃС‚Р°РјРѕРІ',5,40000);
 
