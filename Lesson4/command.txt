@@ -1,0 +1,44 @@
+USE `lesson3`;
+
+# 1.Создать VIEW на основе запросов, которые вы сделали в ДЗ к уроку 3.
+CREATE VIEW `average_sal` AS 
+SELECT `depart`.`name`, AVG(`salary`) AS `average` FROM `shtat` 
+INNER JOIN `depart` 
+ON `depart`.`id` = `shtat`.`depart`
+GROUP BY `depart`.`name`;
+
+
+# 2. Создать функцию, которая найдет менеджера по имени и фамилии.
+CREATE FUNCTION `find_manager`(name_manager CHAR(25), lastname_manager CHAR(25))
+RETURNS CHAR(50) DETERMINISTIC
+RETURN (SELECT `id` FROM `shtat`
+WHERE (`name` = name_manager AND `lastname` = lastname_manager));
+
+SELECT `find_manager`('Георгий','Мухин');
+
+
+# 3. Создать триггер, который при добавлении нового сотрудника будет выплачивать 
+ему вступительный бонус, занося запись об этом в таблицу salary.
+
+CREATE TABLE IF NOT EXISTS `salary` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`employee` INT NOT NULL,
+`salary` INT NOT NULL,
+`start_bonus` INT,
+PRIMARY KEY (`id`)
+)
+
+INSERT INTO `salary` 
+(`employee`, `salary`) VALUES
+(1, 25000), (2, 35000), (3, 45000), (4, 50000), (5, 30000), (6, 50000);
+
+CREATE TRIGGER `start_bon` AFTER INSERT ON `shtat` 
+FOR EACH ROW 
+INSERT INTO `salary` (`employee`, `salary`, `start_bonus`) VALUE
+(NEW.`id`, NEW.`salary`, 10000);
+
+INSERT INTO `shtat`
+(`name`,`lastname`,`depart`,`salary`) VALUE
+('Владимир','Рустамов',5,40000);
+
+
