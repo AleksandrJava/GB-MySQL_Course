@@ -1,0 +1,89 @@
+root@MySQL8:~# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 8.0.13 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> USE `lesson3`;
+Database changed
+
+mysql> BEGIN;
+Query OK, 0 rows affected (0,00 sec)
+
+mysql> SELECT @C:= `salary` FROM `shtat` WHERE `id` = 2;
++---------------+
+| @C:= `salary` |
++---------------+
+|         35000 |
++---------------+
+1 row in set, 1 warning (0,01 sec)
+
+mysql> UPDATE `salary` SET `start_bonus` = @C WHERE `id` = 2;
+Query OK, 1 row affected (0,00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0,05 sec)
+
+mysql> BEGIN;
+Query OK, 0 rows affected (0,00 sec)
+
+mysql> UPDATE `shtat` SET `depart` = 5, `position` = 'рекламщик' WHERE `id` = 7; 
+Query OK, 1 row affected (0,00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0,06 sec)
+
+
+
+
+
+
+
+
+
+mysql> EXPLAIN SELECT CONCAT(`name`, ' ', `lastname`) AS `full_name`, MAX(`salary`) AS `max_salary` FROM `shtat`
+    -> GROUP BY `full_name`
+    -> ORDER BY `max_salary` DESC
+    -> LIMIT 1;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra                           |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------+
+|  1 | SIMPLE      | shtat | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    7 |   100.00 | Using temporary; Using filesort |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+---------------------------------+
+1 row in set, 1 warning (0,00 sec)
+
+
+mysql> EXPLAIN SELECT `salary` FROM `shtat` WHERE `name` = 'Владимир';
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
+|  1 | SIMPLE      | shtat | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    7 |    14.29 | Using where |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
+1 row in set, 1 warning (0,00 sec)
+
+
+
+mysql> CREATE INDEX `names` ON `shtat`(`name`);
+Query OK, 0 rows affected (0,17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> EXPLAIN SELECT `salary` FROM `shtat` WHERE `name` = 'Владимир';
++----+-------------+-------+------------+------+---------------+-------+---------+-------+------+----------+-------+
+| id | select_type | table | partitions | type | possible_keys | key   | key_len | ref   | rows | filtered | Extra |
++----+-------------+-------+------------+------+---------------+-------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | shtat | NULL       | ref  | names         | names | 102     | const |    1 |   100.00 | NULL  |
++----+-------------+-------+------------+------+---------------+-------+---------+-------+------+----------+-------+
+1 row in set, 1 warning (0,00 sec)
+
+mysql> EXIT
+Bye
