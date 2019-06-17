@@ -1,0 +1,161 @@
+[mysqld]
+
+server-id = 1
+
+log_bin = /var/log/mysql/bin.log
+
+binlog_do_db = lesson3
+
+
+
+mysql> GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
+Query OK, 0 rows affected (0,01 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0,00 sec)
+
+mysql> SHOW MASTER STATUS;
++------------+----------+--------------+------------------+-------------------+
+| File       | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------+----------+--------------+------------------+-------------------+
+| bin.000031 |      538 | lesson3      |                  |                   |
++------------+----------+--------------+------------------+-------------------+
+1 row in set (0,01 sec)
+
+
+
+
+-----------------------------------------------------------------------------------
+[mysqld]
+
+server-id = 2
+
+log_bin = bin.log
+
+binlog_do_db = lesson3
+
+relay_log = /var/log/mysql/relay.log
+
+
+
+
+mysql> STOP SLAVE;
+Query OK, 0 rows affected, 1 warning (0,00 sec)
+
+mysql> mysql> RESET SLAVE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'SLAVET SLAVE' at line 1
+mysql> RESET SLAVE;
+Query OK, 0 rows affected (0,00 sec)
+
+mysql> CHANGE MASTER TO MASTER_HOST='192.168.1.36', MASTER_USER = 'root', MASTER_PASSWORD='123123', MASTER_LOG_FILE = 'bin.000031', MASTER_LOG_POS = 538;
+Query OK, 0 rows affected, 2 warnings (0,28 sec)
+
+mysql> START SLAVE;
+Query OK, 0 rows affected (0,01 sec)
+
+mysql> SHOW SLAVE STATUS\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.1.36
+                  Master_User: root
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: bin.000031
+          Read_Master_Log_Pos: 538
+               Relay_Log_File: MySQL8-relay-bin.000002
+                Relay_Log_Pos: 316
+        Relay_Master_Log_File: bin.000031
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: 
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+      Replicate_Wild_Do_Table: 
+  Replicate_Wild_Ignore_Table: 
+                   Last_Errno: 0
+                   Last_Error: 
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 538
+              Relay_Log_Space: 525
+              Until_Condition: None
+               Until_Log_File: 
+                Until_Log_Pos: 0
+           Master_SSL_Allowed: No
+           Master_SSL_CA_File: 
+           Master_SSL_CA_Path: 
+              Master_SSL_Cert: 
+            Master_SSL_Cipher: 
+               Master_SSL_Key: 
+        Seconds_Behind_Master: 0
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error: 
+               Last_SQL_Errno: 0
+               Last_SQL_Error: 
+  Replicate_Ignore_Server_Ids: 
+             Master_Server_Id: 1
+                  Master_UUID: 3a90a3b6-f1ab-11e8-8365-080027ad0e39
+             Master_Info_File: mysql.slave_master_info
+                    SQL_Delay: 0
+          SQL_Remaining_Delay: NULL
+      Slave_SQL_Running_State: Slave has read all relay log; waiting for more updates
+           Master_Retry_Count: 86400
+                  Master_Bind: 
+      Last_IO_Error_Timestamp: 
+     Last_SQL_Error_Timestamp: 
+               Master_SSL_Crl: 
+           Master_SSL_Crlpath: 
+           Retrieved_Gtid_Set: 
+            Executed_Gtid_Set: 
+                Auto_Position: 0
+         Replicate_Rewrite_DB: 
+                 Channel_Name: 
+           Master_TLS_Version: 
+       Master_public_key_path: 
+        Get_master_public_key: 0
+1 row in set (0,00 sec)
+
+mysql> 
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------
+
+> use cities
+switched to db cities
+> db.cities.insert({"title":"Moscow", "important":"capital", "country":"Russia"})
+WriteResult({ "nInserted" : 1 })
+> db.cities.insert({"title":"Moscow", "important":"capital", "country":"Russia"})
+WriteResult({ "nInserted" : 1 })
+> db.cities.insert({"title":"Saratov", "country":"Russia"})
+WriteResult({ "nInserted" : 1 })
+> db.cities.insert({"title":"Milan", "country":"Italy", "population":60590000})
+WriteResult({ "nInserted" : 1 })
+> db.cities.find()
+{ "_id" : ObjectId("5d075672c6fa339f2dc2d346"), "title" : "Moscow", "important" : "capital", "country" : "Russia" }
+{ "_id" : ObjectId("5d07567ac6fa339f2dc2d347"), "title" : "Moscow", "important" : "capital", "country" : "Russia" }
+{ "_id" : ObjectId("5d075725c6fa339f2dc2d348"), "title" : "Saratov", "country" : "Russia" }
+{ "_id" : ObjectId("5d0757a5c6fa339f2dc2d349"), "title" : "Milan", "country" : "Italy", "population" : 60590000 }
+
+> db.cities.update({"_id" : ObjectId("5d07567ac6fa339f2dc2d347")}, {$set:{"title":"Engels"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+> db.cities.find()
+{ "_id" : ObjectId("5d075672c6fa339f2dc2d346"), "title" : "Moscow", "important" : "capital", "country" : "Russia" }
+{ "_id" : ObjectId("5d07567ac6fa339f2dc2d347"), "title" : "Engels", "important" : "capital", "country" : "Russia" }
+{ "_id" : ObjectId("5d075725c6fa339f2dc2d348"), "title" : "Saratov", "country" : "Russia" }
+{ "_id" : ObjectId("5d0757a5c6fa339f2dc2d349"), "title" : "Milan", "country" : "Italy", "population" : 60590000 }
+
+> db.cities.update({"_id" : ObjectId("5d07567ac6fa339f2dc2d347")}, {$unset:{"important":"capital"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.cities.find()
+{ "_id" : ObjectId("5d075672c6fa339f2dc2d346"), "title" : "Moscow", "important" : "capital", "country" : "Russia" }
+{ "_id" : ObjectId("5d07567ac6fa339f2dc2d347"), "title" : "Engels", "country" : "Russia" }
+{ "_id" : ObjectId("5d075725c6fa339f2dc2d348"), "title" : "Saratov", "country" : "Russia" }
+{ "_id" : ObjectId("5d0757a5c6fa339f2dc2d349"), "title" : "Milan", "country" : "Italy", "population" : 60590000 }
+> 
