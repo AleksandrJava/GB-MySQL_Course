@@ -1,0 +1,80 @@
+mysql> CREATE USER 'check'@'%' IDENTIFIED WITH mysql_native_password BY '12341234';
+Query OK, 0 rows affected (0,03 sec)
+
+mysql> USE `lesson1`;
+Database changed
+
+mysql> GRANT SELECT, UPDATE, DELETE, INSERT, INDEX ON `lesson1`.* TO 'check'@'%';
+Query OK, 0 rows affected (0,10 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0,01 sec)
+
+mysql> exit
+Bye
+
+root@MySQL8:~# mysql -u check -p
+Enter password: 
+
+mysql> SHOW SCHEMAS;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| lesson1            |
++--------------------+
+2 rows in set (0,00 sec)
+
+mysql> USE `lesson1`;
+Database changed
+mysql> SHOW TABLES;
++-------------------+
+| Tables_in_lesson1 |
++-------------------+
+| _cities           |
+| _countries        |
+| _regions          |
++-------------------+
+3 rows in set (0,02 sec)
+
+mysql> exit
+
+
+
+--------------------------------------------------------------------------------------------------------
+root@MySQL8~# mysqldump -u root -p123123 lesson1 --routines  /var/200619/mysql/dump.sql
+mysqldump [Warning] Using a password on the command line interface can be insecure.
+
+root@MySQL8~# mysql -u root -p123123
+mysql [Warning] Using a password on the command line interface can be insecure.
+
+mysql DROP DATABASE `lesson1`;
+Query OK, 5 rows affected (1,48 sec)
+
+mysql CREATE DATABASE `lesson1` DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+Query OK, 1 row affected (0,20 sec)
+
+mysql exit
+Bye
+
+root@MySQL8~# mysql -u root -p123123 lesson1  /var/200619/mysql/dump.sql
+
+root@MySQL8~# mysql -u root -p123123
+
+mysql> SELECT * FROM `lesson1`.`_cities`;
++----+------------+-----------+-----------+--------------------------+
+| id | country_id | important | region_id | title                    |
++----+------------+-----------+-----------+--------------------------+
+|  1 |          1 |         0 |         1 | Москва                   |
+|  2 |          1 |         0 |         2 | Саратов                  |
+|  3 |          1 |         0 |         2 | Энгельс                  |
+|  4 |          2 |         0 |         3 | Варезе                   |
+|  5 |          2 |         0 |         3 | Милан                    |
+|  6 |          2 |         0 |         4 | Венеция                  |
+|  7 |          2 |         0 |         4 | Верона                   |
+|  8 |          3 |         0 |         5 | Ренн                     |
+|  9 |          3 |         0 |         6 | Аяччо                    |
+| 10 |          4 |         0 |         7 | Вольфсбург               |
+| 11 |          4 |         0 |         8 | Луккенвальдэ             |
++----+------------+-----------+-----------+--------------------------+
+11 rows in set (0,00 sec)
