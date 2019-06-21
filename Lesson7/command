@@ -57,7 +57,7 @@ Query OK, 1 row affected (0,20 sec)
 mysql exit
 Bye
 
-root@MySQL8~# mysql -u root -p123123 lesson1  /var/200619/mysql/dump.sql
+root@MySQL8~# mysql -u root -p123123 lesson1 < /var/200619/mysql/dump.sql
 
 root@MySQL8~# mysql -u root -p123123
 
